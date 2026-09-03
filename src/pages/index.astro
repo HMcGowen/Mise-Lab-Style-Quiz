@@ -1,0 +1,309 @@
+---
+// Order matters: this array doubles as the tiebreak priority list.
+// If two styles end up tied after all 4 questions, whichever style
+// appears earlier in this array wins.
+const styles = [
+  {
+    id: "gilded-modern",
+    name: "Gilded Modern",
+    description:
+      "Polished and atmospheric, Gilded Modern blends deep finishes, soft brass accents, and structured light. It brings quiet sophistication to refined dining and elevated evening spaces.",
+  },
+  {
+    id: "industrial-warmth",
+    name: "Industrial Warmth",
+    description:
+      "Open and relaxed, Industrial Warmth combines raw steel, oak, and amber light. The look feels natural and inviting, creating balance between comfort and function.",
+  },
+  {
+    id: "velvet-noir",
+    name: "Velvet Noir",
+    description:
+      "Dark and cinematic, Velvet Noir layers rich fabrics, low light, and warm brass tones. It evokes intimacy and calm, capturing the layered atmosphere of late-evening dining.",
+  },
+  {
+    id: "quiet-minimal",
+    name: "Quiet Minimal",
+    description:
+      "Clean and considered, Quiet Minimal combines pale oak, matte white, and soft shadow. It creates an uncluttered backdrop that lets food and craftsmanship take center stage.",
+  },
+  {
+    id: "botanical-retreat",
+    name: "Botanical Retreat",
+    description:
+      "Lush and grounded, Botanical Retreat layers greenery, natural stone, and filtered light. It brings a calming, garden-like presence to spaces built around slow mornings and plant-forward menus.",
+  },
+  {
+    id: "citrus-pop",
+    name: "Citrus Pop",
+    description:
+      "Bold and playful, Citrus Pop combines saturated color, glossy finishes, and punchy graphic details. The look feels energetic and current, built for fast-casual spots and spaces that want to feel young and alive.",
+  },
+];
+
+const questions = [
+  {
+    text: "What's the vibe you want guests to feel first?",
+    options: [
+      { label: "Refined and quietly luxurious", styleId: "gilded-modern" },
+      { label: "Warm and unpretentious", styleId: "industrial-warmth" },
+      { label: "Intimate and moody", styleId: "velvet-noir" },
+      { label: "Calm and understated", styleId: "quiet-minimal" },
+      { label: "Fresh and alive", styleId: "botanical-retreat" },
+      { label: "Energetic and fun", styleId: "citrus-pop" },
+    ],
+  },
+  {
+    text: "What's the lighting like in your space?",
+    options: [
+      { label: "Soft, structured, brass-toned", styleId: "gilded-modern" },
+      { label: "Warm amber, exposed fixtures", styleId: "industrial-warmth" },
+      { label: "Low and dramatic", styleId: "velvet-noir" },
+      { label: "Bright and even, almost gallery-like", styleId: "quiet-minimal" },
+      { label: "Filtered and dappled, plant-adjacent", styleId: "botanical-retreat" },
+      { label: "Bright, bold, and high-energy", styleId: "citrus-pop" },
+    ],
+  },
+  {
+    text: "What materials are you drawn to?",
+    options: [
+      { label: "Brass, deep wood, structured fabric", styleId: "gilded-modern" },
+      { label: "Raw steel, reclaimed wood", styleId: "industrial-warmth" },
+      { label: "Velvet, rich fabric, dark tones", styleId: "velvet-noir" },
+      { label: "Pale oak, matte white", styleId: "quiet-minimal" },
+      { label: "Natural stone, greenery, rattan", styleId: "botanical-retreat" },
+      { label: "Glossy tile, bold color, graphic pattern", styleId: "citrus-pop" },
+    ],
+  },
+  {
+    text: "What color palette feels right for your space?",
+    options: [
+      { label: "Warm neutrals with metallic accents", styleId: "gilded-modern" },
+      { label: "Earthy tones, rust and amber", styleId: "industrial-warmth" },
+      { label: "Deep jewel tones and black", styleId: "velvet-noir" },
+      { label: "Soft whites and pale wood tones", styleId: "quiet-minimal" },
+      { label: "Sage green and natural stone", styleId: "botanical-retreat" },
+      { label: "Bright citrus and bold primary color", styleId: "citrus-pop" },
+    ],
+  },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design Style Matcher | Mise Lab</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Find your restaurant's design style</h1>
+        <p class="subtitle">
+          Answer four quick questions and we'll match you with a Mise Lab
+          design direction.
+        </p>
+      </header>
+
+      <form id="quiz-form">
+        {
+          questions.map((q, qIndex) => (
+            <fieldset>
+              <legend>{`${qIndex + 1}. ${q.text}`}</legend>
+              {q.options.map((opt, optIndex) => (
+                <label class="option">
+                  <input
+                    type="radio"
+                    name={`q${qIndex}`}
+                    value={opt.styleId}
+                    required={optIndex === 0}
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+            </fieldset>
+          ))
+        }
+
+        <button type="submit">See my style</button>
+      </form>
+
+      <section id="result" hidden>
+        <h2 id="result-name"></h2>
+        <p id="result-description"></p>
+
+        <!--
+          STORAGE HOOK — not built yet, on purpose.
+
+          This is where a call to Webflow Cloud's key-value store goes:
+          on each result, increment a counter for that style's id, then
+          read back the current count and display something like
+          "X visitors have also gotten this style."
+
+          Leaving this as plain text for now until the app is deployed
+          and the KV binding is wired up.
+        -->
+        <p id="result-tally" class="tally">
+          (Popularity count will appear here once this is deployed to
+          Webflow Cloud and connected to key-value storage.)
+        </p>
+
+        <button id="retake">Take the quiz again</button>
+      </section>
+    </main>
+
+    <script define:vars={{ styles, questions }}>
+      const form = document.getElementById("quiz-form");
+      const resultSection = document.getElementById("result");
+      const resultName = document.getElementById("result-name");
+      const resultDescription = document.getElementById("result-description");
+      const retakeButton = document.getElementById("retake");
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const tally = {};
+        styles.forEach((style) => (tally[style.id] = 0));
+
+        for (const [, styleId] of formData.entries()) {
+          tally[styleId] = (tally[styleId] || 0) + 1;
+        }
+
+        // Tiebreak: iterate styles in their declared order, so the
+        // first style to reach the highest score wins ties.
+        let winnerId = styles[0].id;
+        let highestCount = -1;
+        for (const style of styles) {
+          if (tally[style.id] > highestCount) {
+            highestCount = tally[style.id];
+            winnerId = style.id;
+          }
+        }
+
+        const winner = styles.find((s) => s.id === winnerId);
+
+        resultName.textContent = winner.name;
+        resultDescription.textContent = winner.description;
+
+        form.hidden = true;
+        resultSection.hidden = false;
+        resultSection.scrollIntoView({ behavior: "smooth" });
+      });
+
+      retakeButton.addEventListener("click", () => {
+        form.reset();
+        form.hidden = false;
+        resultSection.hidden = true;
+        form.scrollIntoView({ behavior: "smooth" });
+      });
+    </script>
+
+    <style>
+      :global(body) {
+        margin: 0;
+        background-color: #211f1e;
+        color: #d6d3d1;
+        font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.5;
+      }
+
+      main {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 64px 24px 96px;
+      }
+
+      h1 {
+        color: #ffffff;
+        font-size: 2.25rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+      }
+
+      .subtitle {
+        color: #b3aeab;
+        margin-bottom: 48px;
+      }
+
+      fieldset {
+        border: none;
+        padding: 0;
+        margin: 0 0 40px;
+      }
+
+      legend {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin-bottom: 16px;
+        padding: 0;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border: 1px solid #3a3735;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+      }
+
+      .option:hover {
+        border-color: #6b6663;
+      }
+
+      .option input {
+        accent-color: #e8a33d;
+      }
+
+      button {
+        background-color: #ffffff;
+        color: #211f1e;
+        border: none;
+        border-radius: 999px;
+        padding: 14px 28px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #e8a33d;
+      }
+
+      #result h2 {
+        color: #ffffff;
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+      }
+
+      #result p {
+        color: #d6d3d1;
+      }
+
+      .tally {
+        font-style: italic;
+        color: #8a8582;
+        font-size: 0.9rem;
+        margin-top: 24px;
+      }
+
+      #retake {
+        margin-top: 24px;
+        background: transparent;
+        color: #ffffff;
+        border: 1px solid #6b6663;
+      }
+
+      #retake:hover {
+        background-color: transparent;
+        border-color: #ffffff;
+        color: #ffffff;
+      }
+    </style>
+  </body>
+</html>
