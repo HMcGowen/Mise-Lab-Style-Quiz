@@ -1,7 +1,4 @@
 ---
-// Order matters: this array doubles as the tiebreak priority list.
-// If two styles end up tied after all 4 questions, whichever style
-// appears earlier in this array wins.
 const styles = [
   {
     id: "gilded-modern",
@@ -131,23 +128,7 @@ const questions = [
       <section id="result" hidden>
         <h2 id="result-name"></h2>
         <p id="result-description"></p>
-
-        <!--
-          STORAGE HOOK — not built yet, on purpose.
-
-          This is where a call to Webflow Cloud's key-value store goes:
-          on each result, increment a counter for that style's id, then
-          read back the current count and display something like
-          "X visitors have also gotten this style."
-
-          Leaving this as plain text for now until the app is deployed
-          and the KV binding is wired up.
-        -->
-        <p id="result-tally" class="tally">
-          (Popularity count will appear here once this is deployed to
-          Webflow Cloud and connected to key-value storage.)
-        </p>
-
+        <p id="result-tally" class="tally"></p>
         <button id="retake">Take the quiz again</button>
       </section>
     </main>
@@ -157,9 +138,14 @@ const questions = [
       const resultSection = document.getElementById("result");
       const resultName = document.getElementById("result-name");
       const resultDescription = document.getElementById("result-description");
+      const resultTally = document.getElementById("result-tally");
       const retakeButton = document.getElementById("retake");
 
-      form.addEventListener("submit", (event) => {
+      // Hardcoded to match the mount path set in the Webflow Cloud deploy
+      // wizard. If that path ever changes, this needs to change too.
+      const TALLY_ENDPOINT = "/style-matcher/api/tally";
+
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         const formData = new FormData(form);
@@ -170,8 +156,6 @@ const questions = [
           tally[styleId] = (tally[styleId] || 0) + 1;
         }
 
-        // Tiebreak: iterate styles in their declared order, so the
-        // first style to reach the highest score wins ties.
         let winnerId = styles[0].id;
         let highestCount = -1;
         for (const style of styles) {
@@ -185,10 +169,28 @@ const questions = [
 
         resultName.textContent = winner.name;
         resultDescription.textContent = winner.description;
+        resultTally.textContent = "Checking how popular this style is...";
 
         form.hidden = true;
         resultSection.hidden = false;
         resultSection.scrollIntoView({ behavior: "smooth" });
+
+        try {
+          const response = await fetch(TALLY_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ styleId: winnerId }),
+          });
+
+          if (!response.ok) throw new Error("Request failed");
+
+          const data = await response.json();
+          const visitorWord = data.count === 1 ? "visitor has" : "visitors have";
+          resultTally.textContent = `${data.count} ${visitorWord} gotten this style so far.`;
+        } catch (error) {
+          resultTally.textContent =
+            "Popularity count is unavailable right now.";
+        }
       });
 
       retakeButton.addEventListener("click", () => {
