@@ -1,4 +1,6 @@
 {
+  "name": "mise-lab-style-quiz",
+  "compatibility_date": "2024-09-23",
   "kv_namespaces": [
     {
       "binding": "KV",
