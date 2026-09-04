@@ -1,5 +1,7 @@
 import { defineConfig } from 'astro/config';
 
+import react from '@astrojs/react';
+
 // Webflow Cloud detects the framework and generates the required
 // platform (Cloudflare Workers) config automatically at deploy time.
 // Nothing platform-specific needs to live here.
@@ -10,4 +12,5 @@ import { defineConfig } from 'astro/config';
 // revisit at that point, not before.
 export default defineConfig({
   output: 'static',
+  integrations: [react()],
 });

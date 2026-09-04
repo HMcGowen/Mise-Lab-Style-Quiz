@@ -1,4 +1,16 @@
 ---
+import { Navbar } from "../components/Navbar.tsx";
+import { Footer } from "../components/Footer.tsx";
+import { Hero } from "../components/Hero.tsx";
+import { DevLinkProvider } from "../components/DevLinkProvider.tsx";
+import { DEVLINK_SCOPE_CLASS } from "../components/devlinkScope.ts";
+import "../components/css/normalize.css";
+import "../components/css/global.css";
+import "../components/css/defaults.css";
+import "../components/css/tags.css";
+import "../components/css/classes.css";
+import "../components/css/variables.css";
+import "../components/css/fonts.css";
 const styles = [
   {
     id: "gilded-modern",
@@ -93,10 +105,14 @@ const questions = [
     <title>Design Style Matcher | Mise Lab</title>
   </head>
   <body>
+    <DevLinkProvider client:load>
+     <Navbar client:load />
+   </DevLinkProvider>
+    <Hero />
     <main>
       <header>
         <h1>Find your restaurant's design style</h1>
-        <p class="subtitle">
+        <p class="subtitle text-style-medium">
           Answer four quick questions and we'll match you with a Mise Lab
           design direction.
         </p>
@@ -122,16 +138,21 @@ const questions = [
           ))
         }
 
-        <button type="submit">See my style</button>
+        <div class={DEVLINK_SCOPE_CLASS} style="display: contents;">
+          <button type="submit" class="w-button button-primary">See my style</button>
+        </div>
       </form>
 
       <section id="result" hidden>
         <h2 id="result-name"></h2>
-        <p id="result-description"></p>
+        <p id="result-description" class="text-style-medium"></p>
         <p id="result-tally" class="tally"></p>
         <button id="retake">Take the quiz again</button>
       </section>
     </main>
+    <DevLinkProvider client:load>
+      <Footer />
+    </DevLinkProvider>
 
     <script define:vars={{ styles, questions }}>
       const form = document.getElementById("quiz-form");
@@ -204,9 +225,9 @@ const questions = [
     <style>
       :global(body) {
         margin: 0;
-        background-color: #211f1e;
-        color: #d6d3d1;
-        font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+        background-color: var(--colors--primary-onyx);
+        color: var(--colors--body-text-warm-lt-gray);
+        font-family: var(--font-family--body-font);
         line-height: 1.5;
       }
 
@@ -217,14 +238,14 @@ const questions = [
       }
 
       h1 {
-        color: #ffffff;
-        font-size: 2.25rem;
-        font-weight: 800;
+        color: var(--colors--headings-white);
+        font-family: var(--font-family--primary-heading-font);
+        font-size: var(--font-size--h2-headings);
+        font-weight: 600;
         margin-bottom: 12px;
       }
 
       .subtitle {
-        color: #b3aeab;
         margin-bottom: 48px;
       }
 
@@ -235,7 +256,8 @@ const questions = [
       }
 
       legend {
-        color: #ffffff;
+        color: var(--colors--headings-white);
+        font-family: var(--font-family--body-font);
         font-weight: 700;
         font-size: 1.05rem;
         margin-bottom: 16px;
@@ -261,30 +283,12 @@ const questions = [
         accent-color: #e8a33d;
       }
 
-      button {
-        background-color: #ffffff;
-        color: #211f1e;
-        border: none;
-        border-radius: 999px;
-        padding: 14px 28px;
-        font-size: 1rem;
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background-color: #e8a33d;
-      }
-
       #result h2 {
-        color: #ffffff;
-        font-size: 2rem;
-        font-weight: 800;
+        color: var(--colors--headings-white);
+        font-family: var(--font-family--primary-heading-font);
+        font-size: var(--font-size--h3-headings);
+        font-weight: 600;
         margin-bottom: 12px;
-      }
-
-      #result p {
-        color: #d6d3d1;
       }
 
       .tally {
@@ -299,6 +303,11 @@ const questions = [
         background: transparent;
         color: #ffffff;
         border: 1px solid #6b6663;
+        border-radius: 999px;
+        padding: 14px 28px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
       }
 
       #retake:hover {
