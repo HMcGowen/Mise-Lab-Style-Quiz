@@ -501,6 +501,9 @@
       grid-column-gap: 16px;
       grid-row-gap: 16px;
     }
+    .footer-social-list {
+      padding-bottom: 0rem;
+    }
     .footer-credit-text {
       margin-top: 2rem;
     }
@@ -518,6 +521,18 @@
     .footer-menu-wrapper {
       grid-row-gap: 40px;
       grid-template-columns: 1fr;
+    }
+    .hero-section-page {
+      flex-direction: column;
+      flex-wrap: nowrap;
+    }
+    .hero-image-wrapper {
+      max-width: 100%;
+    }
+    .hero-content-page {
+      max-width: 100%;
+      grid-column-gap: 35px;
+      grid-row-gap: 35px;
     }
   }
 }
