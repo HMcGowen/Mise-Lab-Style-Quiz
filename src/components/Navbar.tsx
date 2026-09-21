@@ -153,7 +153,7 @@ export function Navbar({}: NavbarProps) {
             <NavbarLink
               className={"nav_link"}
               options={{
-                href: "/style-matcher",
+                href: "/style-quiz",
               }}
             >
               {"Style Quiz"}

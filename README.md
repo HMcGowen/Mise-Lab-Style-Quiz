@@ -20,9 +20,10 @@ after this app is deployed and connected to Webflow Cloud's storage.
 ## Next steps to deploy
 
 1. Push this project to a new GitHub repository.
-2. In Webflow, open Site Settings > Webflow Cloud on the Mise Lab site.
+2. In Webflow, open Site Settings > Webflow Cloud on the Mise Lab site
+   (site ID `6ab12a815d07a8711ce18c93`).
 3. Start the deploy wizard, choose "Bring your own app," and point it at
    this repository.
-4. Choose "Existing site" as the deployment target and set a mount path
-   (for example, `/style-matcher`), rather than a new standalone domain.
+4. Choose "Existing site" as the deployment target and set the mount path
+   to `/style-quiz`, rather than a new standalone domain.
 5. Deploy, then visit the mounted path on the live site to test it.
